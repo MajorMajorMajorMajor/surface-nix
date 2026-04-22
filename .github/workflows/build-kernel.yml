@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,7 +24,18 @@ jobs:
           name: surface-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
+      - name: Update flake.lock
+        run: nix flake update
+
       - name: Build linux-surface kernel
         run: |
           nix build .#nixosConfigurations.surface.config.boot.kernelPackages.kernel \
             --no-link --print-out-paths
+
+      - name: Commit flake.lock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add flake.lock
+          git diff --staged --quiet || git commit -m "chore: update flake.lock [skip ci]"
+          git push
