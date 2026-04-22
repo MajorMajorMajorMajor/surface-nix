@@ -2,9 +2,7 @@
     description = "Surface Pro NixOS";
 
     inputs = {
-        # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-        # nixpkgs.url = "path:/nix/var/nix/profiles/per-user/root/channels/nixos";
-        nixpkgs.url = "path:/nix/store/i7yaqp51amk4k7mc0aanx05b3ar96hrq-nixos-25.11.9476.e07580dae397/nixos";
+        nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
         nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     };
 
@@ -18,19 +16,23 @@
                 ./configuration.nix
                 ./hardware-configuration.nix
 
-                # nixos-hardware.nixosModules.microsoft-surface-common
-                # nixos-hardware.nixosModules.microsoft-surface-pro-intel
-
-                # "${nixos-hardware}/microsoft/surface/common"
-                # "${nixos-hardware}/microsoft/surface/surface-pro-intel"
+                nixos-hardware.nixosModules.microsoft-surface-pro-intel
 
                 ({ pkgs, ...}: {
                     nix.settings.experimental-features = [ "nix-command" "flakes" ];
+                    nix.settings.substituters = [
+                        "https://cache.nixos.org"
+                        "https://linux-surface.cachix.org"
+                    ];
+                    nix.settings.trusted-public-keys = [
+                        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+                        "linux-surface.cachix.org-1:dorigzlDDV6AacaQLVHHYU8scAzBIlwAhGz/JQ8fVeI="
+                    ];
 
                     # microsoft-surface.ipts.enable = true;  # touchscreen
 
-                    environment.systemPackages = with pkgs; [ 
-                        vim 
+                    environment.systemPackages = with pkgs; [
+                        vim
                     ];
                 })
             ];
